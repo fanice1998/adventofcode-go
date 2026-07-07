@@ -23,26 +23,42 @@ func simple() int {
 	area := 0
 	for _, val := range nums {
 		l, w, h := val[0], val[1], val[2]
-		area += 2*l*w + 2*w*h + 2*l*h
-		switch {
-		case l > w && l > h:
-			area += w * h
-		case w > h && w > l:
-			area += h * l
-		case h > l && h > w:
-			area += l * w
-		case h == l && l > w:
-			area += l * w
-		case h == l && l == w:
-			area += l * w
-		case l == w && w > h:
-			area += l * h
-		case h == w && w > l:
-			area += l * h
-		}
+
+		// part 1
+		// area += 2*l*w + 2*w*h + 2*l*h
+		// m1, m2 := getMinSecond(val)
+		// area += m1 * m2
+
+		// part 2
+		area += l * w * h
+		m1, m2 := getMinSecond(val)
+		area += 2 * (m1 + m2)
+
 	}
 
 	return area
+}
+
+func getMinSecond(val []int) (int, int) {
+	l, w, h := val[0], val[1], val[2]
+	switch {
+	case l > w && l > h:
+		return w, h
+	case w > h && w > l:
+		return h, l
+	case h > l && h > w:
+		return l, w
+	case h == l && l > w:
+		return l, w
+	case h == l && l == w:
+		return l, w
+	case l == w && w > h:
+		return l, h
+	case h == w && w > l:
+		return l, h
+	}
+
+	return 0, 0
 }
 
 func convertIntSlice(data string) [][]int {
