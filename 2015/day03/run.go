@@ -5,47 +5,97 @@ import (
 	"os"
 )
 
+type roadMap struct {
+	x    int
+	y    int
+	data map[int]map[int]int
+}
+
 func main() {
 	data, err := readData("data")
 	if err != nil {
 		fmt.Printf("err: %v", err)
 	}
 
-	roadMap := map[int]map[int]int{}
-	x, y := 0, 0
+	santa := roadMap{
+		x:    0,
+		y:    0,
+		data: map[int]map[int]int{},
+	}
 	gift := 0
 	for _, v := range data {
-		switch string(v) {
-		case "^":
-			y++
-			checkMap(roadMap, x, y)
-		case "v":
-			y--
-			checkMap(roadMap, x, y)
-		case ">":
-			x++
-			checkMap(roadMap, x, y)
-		case "<":
-			x--
-			checkMap(roadMap, x, y)
-		}
+		santa.runMap(v)
 	}
 
-	for x := range roadMap {
-		for range roadMap[x] {
+	for x := range santa.data {
+		for range santa.data[x] {
 			gift++
 		}
 	}
 
-	fmt.Println(gift)
-}
+	fmt.Println("Part one: ", gift)
 
-func checkMap(roadMap map[int]map[int]int, x, y int) {
-	if _, ok := roadMap[x]; !ok {
-		roadMap[x] = map[int]int{}
+	// -------------------
+	santa = roadMap{
+		x:    0,
+		y:    0,
+		data: map[int]map[int]int{},
+	}
+	santa_bot := roadMap{
+		x:    0,
+		y:    0,
+		data: map[int]map[int]int{},
+	}
+	gift = 0
+
+	option := true
+	for _, v := range data {
+		if option {
+			santa.runMap(v)
+		} else {
+			santa_bot.runMap(v)
+		}
+		option = !option
+	}
+	for x := range santa.data {
+		for y := range santa.data[x] {
+			if _, ok := santa_bot.data[x][y]; !ok {
+				gift++
+			}
+		}
+	}
+	for x := range santa_bot.data {
+		for range santa_bot.data[x] {
+			gift++
+		}
 	}
 
-	roadMap[x][y]++
+	fmt.Println("Part two: ", gift)
+}
+
+func (s *roadMap) runMap(v rune) {
+	switch string(v) {
+	case "^":
+		s.y++
+		s.checkMap()
+	case "v":
+		s.y--
+		s.checkMap()
+	case ">":
+		s.x++
+		s.checkMap()
+	case "<":
+		s.x--
+		s.checkMap()
+	}
+}
+
+func (s *roadMap) checkMap() {
+	if _, ok := s.data[s.x]; !ok {
+		s.data[s.x] = map[int]int{}
+	}
+
+	s.data[s.x][s.y]++
 }
 
 func readData(fileName string) (string, error) {
