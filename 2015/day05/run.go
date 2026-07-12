@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+type NiceString struct {
+	data string
+	nice bool
+}
+
 func main() {
 	dataFile, err := readData("data")
 	if err != nil {
@@ -15,26 +20,21 @@ func main() {
 
 	count := 0
 	for line := range strings.SplitSeq(dataFile, "\n") {
-		ok := false
-		ok = checkThreeVowels(line)
-		if !ok {
+		str := NiceString{
+			data: line,
+			nice: true,
+		}
+
+		str.checkThreeVowels()
+		str.checkTwiceLetter()
+		str.checkContain()
+
+		if !str.nice {
 			continue
 		}
 
-		ok = checkTwiceLetter(line)
-		if !ok {
-			continue
-		}
-
-		ok = checkContain(line)
-		if !ok {
-			continue
-		}
-
-		if ok {
+		if str.nice {
 			count++
-			ok = false
-			fmt.Println(line, checkThreeVowels(line), checkTwiceLetter(line), checkContain(line), count)
 		}
 	}
 
@@ -43,46 +43,63 @@ func main() {
 
 }
 
-func checkThreeVowels(checkStr string) bool {
+func (s *NiceString) checkThreeVowels() {
+	if !s.nice {
+		return
+	}
 	vowels := []string{"a", "e", "i", "o", "u"}
 	count := 0
 
 	for _, vowel := range vowels {
-		count += strings.Count(checkStr, vowel)
+		count += strings.Count(s.data, vowel)
 		if count >= 3 {
-			return true
+			s.nice = true
+			return
 		}
 	}
-	return false
+
+	s.nice = false
+	return
 }
 
-func checkTwiceLetter(checkStr string) bool {
+func (s *NiceString) checkTwiceLetter() {
 	var tmp rune
+	if !s.nice {
+		return
+	}
 
-	for _, v := range checkStr {
+	for _, v := range s.data {
 		switch tmp {
 		case 0:
 			tmp = v
 		case v:
-			return true
+			s.nice = true
+			return
 		default:
 			tmp = v
 		}
 	}
 
-	return false
+	s.nice = false
+	return
 }
 
-func checkContain(checkStr string) bool {
+func (s *NiceString) checkContain() {
+	if !s.nice {
+		return
+	}
+
 	var ForbiddenWords = []string{"ab", "cd", "pq", "xy"}
 
 	for _, v := range ForbiddenWords {
-		if strings.Contains(checkStr, v) {
-			return false
+		if strings.Contains(s.data, v) {
+			s.nice = false
+			return
 		}
 	}
 
-	return true
+	s.nice = true
+	return
 }
 
 func readData(fileName string) (string, error) {
