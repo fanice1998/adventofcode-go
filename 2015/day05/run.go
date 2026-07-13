@@ -41,6 +41,59 @@ func main() {
 	fmt.Println("Part one")
 	fmt.Println(count)
 
+	count = 0
+	for line := range strings.SplitSeq(dataFile, "\n") {
+		str := NiceString{
+			data: line,
+			nice: true,
+		}
+
+		str.doubleWords()
+		str.intervalWord()
+
+		if !str.nice {
+			continue
+		}
+
+		if str.nice {
+			count++
+		}
+	}
+
+	fmt.Println("Part two")
+	fmt.Println(count)
+}
+
+func (s *NiceString) intervalWord() {
+	if !s.nice {
+		return
+	}
+
+	for idx := range len(s.data) - 3 {
+		if s.data[idx] == s.data[idx+2] {
+			s.nice = true
+			return
+		}
+	}
+
+	s.nice = false
+}
+
+func (s *NiceString) doubleWords() {
+	if !s.nice {
+		return
+	}
+
+	for idx := range len(s.data) - 3 {
+		checkWords := s.data[idx : idx+2]
+		remainWords := s.data[idx+2:]
+		if strings.Contains(remainWords, checkWords) {
+			s.nice = true
+			return
+		}
+	}
+
+	s.nice = false
 }
 
 func (s *NiceString) checkThreeVowels() {
@@ -59,7 +112,6 @@ func (s *NiceString) checkThreeVowels() {
 	}
 
 	s.nice = false
-	return
 }
 
 func (s *NiceString) checkTwiceLetter() {
@@ -81,7 +133,6 @@ func (s *NiceString) checkTwiceLetter() {
 	}
 
 	s.nice = false
-	return
 }
 
 func (s *NiceString) checkContain() {
@@ -99,7 +150,6 @@ func (s *NiceString) checkContain() {
 	}
 
 	s.nice = true
-	return
 }
 
 func readData(fileName string) (string, error) {
