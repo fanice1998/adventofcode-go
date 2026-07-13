@@ -69,7 +69,7 @@ func (s *NiceString) intervalWord() {
 		return
 	}
 
-	for idx := range len(s.data) - 3 {
+	for idx := range len(s.data) - 2 {
 		if s.data[idx] == s.data[idx+2] {
 			s.nice = true
 			return
